@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- <ItemGroup>
+    <ProjectReference Include="..\ClassLibrary1\ClassLibrary1.csproj" />
+  </ItemGroup> -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Matveeva.401" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
