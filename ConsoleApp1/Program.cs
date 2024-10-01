@@ -2,6 +2,7 @@
 using ClassLibrary1;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Linq.Expressions;
 public class App
 {
     protected class myHandler {
@@ -9,6 +10,7 @@ public class App
         public myHandler (Generation gen) => Gen = gen;
         public void runHandler(object? sender, ConsoleCancelEventArgs args)
         {
+            
             args.Cancel = true;
             var pos = Console.GetCursorPosition();
             Console.SetCursorPosition(pos.Left - 2, pos.Top);
@@ -16,7 +18,9 @@ public class App
                 Console.Write(city.ToString() + " ");
             }
             Console.WriteLine();
-            Process.GetCurrentProcess().Kill();
+            //Process.GetCurrentProcess().Kill();
+            args.Cancel = true;
+            throw new OperationCanceledException();
         }
     }
     public static void Main(string[] args) {
@@ -25,7 +29,8 @@ public class App
         int[,] dist = new int[7, 7];
         for (int i = 0; i < 7; ++i){
             for (int j = 0; j < 7; ++j){
-                dist[i, j] = rand.Next(100);
+                dist[i, j] = rand.Next(100) + 10;
+                dist[j, i] = dist[i, j];
             }
             dist[i,i] = 0;
         }
@@ -39,11 +44,16 @@ public class App
         Generation gen = new Generation(gen_size, dist, mutation_rate);
         myHandler handler = new myHandler(gen);
         Console.CancelKeyPress += new ConsoleCancelEventHandler(handler.runHandler);
-        while (true)
-        {
-            Console.WriteLine($" {gen.NumberGeneration} {gen.BestDistance}");
-            gen.Step();
-            Thread.Sleep(100);
-        }  
+        try {
+            while (true)
+            {
+                Console.WriteLine($" {gen.NumberGeneration} {gen.BestDistance}");
+                gen.Step();
+                Thread.Sleep(100);
+            }
+        }
+        catch (OperationCanceledException ex){
+            Console.WriteLine("");
+        }
     }
 }
