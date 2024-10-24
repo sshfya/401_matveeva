@@ -26,17 +26,23 @@ public class App
     public static void Main(string[] args) {
         int gen_size = 10;
         Random rand = new Random();
-        int[,] dist = new int[7, 7];
-        for (int i = 0; i < 7; ++i){
-            for (int j = 0; j < 7; ++j){
-                dist[i, j] = rand.Next(100) + 10;
-                dist[j, i] = dist[i, j];
-            }
-            dist[i,i] = 0;
+        double[, ] dist = new double[10, 10];
+        City[] towns = new City[10];
+        double x, y;
+        for (int i = 0; i < 10; ++i)
+        {
+            x = rand.NextDouble() * 100;
+            y = rand.NextDouble() * 100;
+            towns[i] = new City(x, y);
         }
-        for (int i = 0; i < 7; ++i){
-            for (int j = 0; j < 7; ++j){
-                Console.Write($"{dist[i, j]} ");
+        for (int i = 0; i < 10; ++i)
+        {
+            for (int j = 0; j < 10; ++j)
+                dist[i, j] = City.Get_S(towns[i], towns[j]);
+        }
+        for (int i = 0; i < 10; ++i){
+            for (int j = 0; j < 10; ++j){
+                Console.Write($"{(int)dist[i, j]} ");
             }
             Console.WriteLine();
         }  

@@ -1,0 +1,38 @@
+﻿<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <local:DoubleToStringConverter x:Key="DoubleToStringConverter"/>
+        <local:ListToPlotConverter x:Key="ListToPlotConverter"/>
+    </Window.Resources>
+    <Grid>
+        <TextBox x:Name="MutationRate" HorizontalAlignment="Left" Margin="33,36,0,0" TextWrapping="Wrap" Text="{Binding MutationRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource DoubleToStringConverter}}" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="44,15,0,0" TextWrapping="Wrap" Text="Mutation rate" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="44,76,0,0" TextWrapping="Wrap" Text="Size of generation" VerticalAlignment="Top"/>
+        <TextBox x:Name="SizeGeneration" HorizontalAlignment="Left" Margin="33,97,0,0" TextWrapping="Wrap" Text="{Binding SizeGeneration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="44,140,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Count cities"/>
+        <TextBox x:Name="CountCities" HorizontalAlignment="Left" Margin="33,161,0,0" TextWrapping="Wrap" Text="{Binding CountCities, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120"/>
+        <Button Command="{Binding StartCommand}"  Content=" Start " HorizontalAlignment="Left" Margin="73,0,0,0" VerticalAlignment="Center" Height="25" Width="43"/>
+        <Button Command="{Binding StopCommand}" Content="Stop" HorizontalAlignment="Left" Margin="432,140,0,0" VerticalAlignment="Top" Height="28" Width="48"/>
+        <TextBlock HorizontalAlignment="Left" Margin="429,68,0,0" TextWrapping="Wrap" Text="Best result" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Margin="432,92,0,0" TextWrapping="Wrap" Text="{Binding BestResult, Mode=OneWay, Converter={StaticResource DoubleToStringConverter}}" VerticalAlignment="Top" Width="48" IsReadOnly="True"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="494,92,0,0"  Height="35" VerticalAlignment="Top" Width="281" HorizontalAlignment="Left">
+            <TextBox TextWrapping="Wrap" Text="{Binding CityTourOrder, Mode=OneWay}"  IsReadOnly="True"/>
+        </ScrollViewer>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Left" Margin="496,148,0,0" Height="50" VerticalAlignment="Top" Width="281">
+            <TextBox  TextWrapping="Wrap" Text="{Binding Distances, Mode=OneWay}" IsReadOnly="True"/>
+        </ScrollViewer>
+        <TextBlock HorizontalAlignment="Left" Margin="598,71,0,0" TextWrapping="Wrap" Text="City tour order" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="598,127,0,0" TextWrapping="Wrap" Text="Distances between cities" VerticalAlignment="Top"/>
+        <oxy:PlotView Name="Plotter" Model="{Binding Results, Mode=OneWay, Converter={StaticResource ListToPlotConverter}}" HorizontalAlignment="Left" Margin="434,210,0,0" VerticalAlignment="Top" Height="200" Width="343"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="184,35,0,0" Height="200" Width="200" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <StackPanel x:Name="DistMatrix" Orientation="Vertical"></StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
