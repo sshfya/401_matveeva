@@ -55,8 +55,8 @@ namespace VIewModel
             RaisePropertyChanged("SizeGeneration");
             RaisePropertyChanged("CountCities");
             View = view;
-            StartCommand = new RelayCommand(Start, () => true);
-            StopCommand = new RelayCommand(Stop, () => true);
+            StartCommand = new RelayCommand(Start, () => !isRunning);
+            StopCommand = new RelayCommand(Stop, () => isRunning);
 
         }
         public double MutationRate { get ; set; }
@@ -79,6 +79,9 @@ namespace VIewModel
             Results = new List<double>();
             generation = new Generation(SizeGeneration, Dist, MutationRate);
             isRunning = true;
+            StartCommand.RaiseCanExecuteChanged();
+            StopCommand.RaiseCanExecuteChanged();
+
             _ = Task.Factory.StartNew(() =>
             {
                 while (isRunning)
@@ -97,11 +100,14 @@ namespace VIewModel
                 }
                 generation = null;
                 Dist = null;
-            });
+            }, TaskCreationOptions.LongRunning);
         }
         public void Stop()
         {
             isRunning = false;
+            StartCommand.RaiseCanExecuteChanged();
+            StopCommand.RaiseCanExecuteChanged();
+
         }
 
         private void GenerateDist()
