@@ -10,6 +10,7 @@ public class Route : IComparable
     public int[] Order { get; set; }
     public double TotalDistance { get; set; }
     public double[,] Dist { get; set; }
+    public Route() { }
     public Route(int N, double[,] dist)
     {
         Random rand = new Random();

@@ -12,6 +12,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using VIewModel;
 using static System.Net.Mime.MediaTypeNames;
+using System.Text.Json;
+using System.Text;
+using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace WpfApp1
 {
@@ -73,15 +77,86 @@ namespace WpfApp1
         {
             return null;
         }
+
     }
     public partial class MainWindow : Window, IUIServices
     {
+
         public MainWindow()
         {
             DataContext = new MainViewModel(this);
             InitializeComponent();
+            if (!File.Exists("runs.json"))
+                File.Create("runs.json");
         }
-
+        public bool Save(string filename, string content)
+        {
+            try 
+            {
+                File.WriteAllText(filename, content);
+            }
+            catch
+            {
+                Delete(filename);
+                return false;
+            }
+            return true;
+        }
+        public string Load(string filename)
+        {
+            try 
+            {
+                return File.ReadAllText(filename);
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+        public string LoadRuns()
+        {
+            try
+            {
+                return File.ReadAllText("runs.json");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public string GetFilename(List<(string, string)> runs)
+        {
+            Files dlg_window = new Files();
+            if (runs.Count == 0) return null;
+            dlg_window.list_files.ItemsSource = runs.Select(x => x.Item1);
+            dlg_window.ShowDialog();
+            if ((bool)dlg_window.DialogResult)
+            {
+                return runs[dlg_window.list_files.SelectedIndex].Item2;
+            }
+            return null;
+        }
+        public void Delete(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                File.Delete(filename);
+            }
+        }
+        public bool SaveRuns(string content)
+        {
+            try
+            {
+                File.WriteAllText("new_runs.json", content);
+            }
+            catch (Exception ex) {
+                Delete("new_runs.json");
+                return false;
+            }
+            File.Move("new_runs.json", "runs.json", true);
+            Delete("new_runs.json");  
+            return true;
+        }
         public void Dist(double[,] dist)
         {
             //DistMatrix.Children.Clear();

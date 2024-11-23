@@ -34,5 +34,10 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="184,35,0,0" Height="200" Width="200" VerticalAlignment="Top" HorizontalAlignment="Left">
             <StackPanel x:Name="DistMatrix" Orientation="Vertical"></StackPanel>
         </ScrollViewer>
+        <Button Content="Save" HorizontalAlignment="Left" Margin="336,290,0,0" VerticalAlignment="Top" Height="29" Width="84" Command="{Binding SaveCommand}"/>
+        <Button Content="Load" HorizontalAlignment="Left" Margin="336,340,0,0" VerticalAlignment="Top" Height="29" Width="84" Command="{Binding LoadCommand}"/>
+        <TextBox x:Name="NameExperiment" HorizontalAlignment="Left" Margin="34,277,0,0" TextWrapping="Wrap" Text="{Binding NameExp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="40,256,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Name of experiment"/>
+        <Button Content="Clear" HorizontalAlignment="Left" Margin="432,178,0,0" VerticalAlignment="Top" Height="27" Width="48" Command="{Binding ClearCommand}"/>
     </Grid>
 </Window>
