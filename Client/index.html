@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<head>
+<style type="text/css">
+    #horizontal { 
+        float: left; 
+        /* width: 320px; */
+        margin-right: 25px; 
+    }
+
+</style>
+</head>
+<body style="color: black; background-color:seashell;">
+    <div style="text-align: center">
+        <button id="start_btn" type="button">Start</button>
+        <button id="stop" type="button" disabled>Stop</button>
+        <button id="clear" type="button" disabled>Clear</button>
+    </div>
+    <div>
+        <div id="horizontal">
+            <div>Count cities</div>
+            <input type="text", id = "Count cities" value="10"></input>
+            <div></div>&nbsp;
+            <div>Size of populathion</div>
+            <input type="text", id = "Size of populathion" value="10"></input>
+            <div></div>&nbsp;
+            <div>Mutation rate</div>
+            <input type="text", id = "Mutation rate" value="0.5"></input>
+        </div>
+        <div id="horizontal">
+            <table id="Distances"></table>
+            <div id="Metric"></div>
+            <div id="Route"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const localhost_port = "5083"
+        function GeneratePoints(n, min = 0, max = 100) {
+            const points = [];
+            for (let i = 0; i < n; i++) {
+                const x = Math.random() * (max - min) + min;
+                const y = Math.random() * (max - min) + min;
+                points.push({ x, y });
+            }
+            return points;
+        }
+
+        function CalculateDistance(a, b) {
+            return Math.sqrt(
+                Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)
+            );
+        }
+
+        function BuildDistanceMatrix(points) {
+            const matrix = [];
+            for (let i = 0; i < points.length; i++) {
+                const row = [];
+                for (let j = 0; j < points.length; j++) {
+                    row.push(CalculateDistance(points[i], points[j]));
+                }
+                matrix.push(row);
+            }
+            return matrix;
+        }
+        function GenerateDistances() {
+            var dst_table = document.getElementById("Distances")
+            dst_table.innerHTML = ""
+            dst_table.style.borderCollapse = 'collapse';
+            var n_cities = parseInt(document.getElementById("Count cities").value)
+            var matrix = BuildDistanceMatrix(
+                GeneratePoints(n_cities)
+            )
+            for (let i = 0; i < n_cities; i++) {
+                const tr = dst_table.insertRow();
+                for (let j = 0; j < n_cities; j++) {
+                    const td = tr.insertCell();
+                    const text_node = document.createTextNode(matrix[i][j].toFixed(2))
+                    td.style.fontSize = '15px'
+                    td.appendChild(text_node);
+                    td.style.backgroundColor = 'white'
+                    td.style.border = '1px solid black';
+                    td.style.width = '50px'
+                }
+            }
+            return matrix
+        }
+        
+        async function Start() {
+            while (is_running == true) {
+                let response = await fetch('http://localhost:' + localhost_port + '/experiments/' + id, {
+                    method: 'POST', 
+                    body: "",
+                    headers: { "Content-type": "application/json; charset=UTF-8" }
+                }).then(response => response.json())
+                
+                console.log(response)
+                var metric = document.getElementById("Metric")
+                metric.innerText = response.metric
+                metric.style.backgroundColor = 'white'
+                metric.style.border = '1px solid black';
+                var route = document.getElementById("Route")
+                route.innerText = response.route
+                route.style.backgroundColor = 'white'
+                route.style.border = '1px solid black';
+            }
+            start_btn.disabled = false
+        }
+        let id = null
+        let dst_mat = null
+        var is_running = false
+        var run = null
+        const stop_btn = document.getElementById("stop")
+        stop_btn.addEventListener("click", async (event) => {
+            event.preventDefault()
+            is_running = false
+            await run
+            console.log("Нажата кнопка Stop")
+            stop_btn.disabled = true
+            clear_btn.disabled = false
+        });
+        const clear_btn = document.getElementById("clear")
+        clear_btn.addEventListener("click", async (event) => {
+            event.preventDefault();
+            is_running = false
+            await run
+            console.log("Нажата кнопка Clear")
+            try {
+                await fetch('http://localhost:' + localhost_port + '/experiments/' + id, {
+                    method: 'DELETE',
+                    body: "",
+                    headers: { "Content-type": "application/json; charset=UTF-8" }
+                });
+                console.log("Данные успешно удалены")
+            } catch (error) {
+                console.error("Ошибка при удалении данных:", error)
+            }
+            id = null
+            stop_btn.disabled = true
+            clear_btn.disabled = true
+        });
+        const start_btn = document.getElementById("start_btn")
+        start_btn.addEventListener("click", async (event) => {
+            event.preventDefault()
+            start_btn.disabled = true
+            stop_btn.disabled = false
+            clear_btn.disabled = false
+            is_running = true
+            
+            if (id == null) {
+                var obj = new Object();
+                dst_mat = GenerateDistances()
+                obj.Dist = dst_mat
+                obj.MutationRate = parseFloat(document.getElementById("Mutation rate").value)
+                obj.N = parseInt(document.getElementById("Size of populathion").value)
+
+                var content= JSON.stringify(obj);
+                console.log(content)
+                try {
+                    const response = await fetch('http://localhost:' + localhost_port + '/experiments/', {
+                        method: 'PUT',
+                        body: content,
+                        headers: { "Content-type": "application/json; charset=UTF-8" }
+                    });
+                    console.log("HTTP статус ответа:", response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    id = await response.json();
+                    console.log("ID получен:", id);
+                } catch (error) {
+                    console.error("Ошибка во время выполнения запроса:", error);
+                }
+            }
+            run = Start()  
+        })
+    </script>
+    
+</body>
